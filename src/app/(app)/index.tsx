@@ -11,6 +11,7 @@ import {
 import { StatusBar } from "expo-status-bar";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/utils/supabase";
+import { router } from "expo-router";
 
 export default function Index() {
   const [session, setSession] = useState<Session | null>(null);
@@ -83,20 +84,24 @@ export default function Index() {
             <Pressable
               style={styles.primaryButton}
               onPress={() =>
-                Alert.alert(
-                  "Coming soon",
-                  "Account registration will be available soon."
-                )
+                router.push("/(auth)/sign-up")
               }
             >
               <Text style={styles.primaryButtonText}>
                 Create an account
               </Text>
             </Pressable>
-
-            <Text style={styles.hint}>
-              Account registration is coming soon.
-            </Text>
+            
+            <Pressable
+              style={styles.secondaryButton}
+              onPress={() =>
+                router.push("/(auth)")
+              }
+            >
+              <Text style={styles.secondaryButtonText}>
+                Already have an account? Sign in
+              </Text>
+            </Pressable>
           </View>
         )}
       </View>
