@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import {
   Alert,
@@ -10,7 +9,7 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { Link, router } from "expo-router";
+import { Link } from "expo-router";
 import { supabase } from "@/utils/supabase";
 
 export default function SignInScreen() {
@@ -25,20 +24,16 @@ export default function SignInScreen() {
     }
 
     setLoading(true);
-
     const { error } = await supabase.auth.signInWithPassword({
-      email: email.trim(),
+      email: email.trim().toLowerCase(),
       password,
     });
-
     setLoading(false);
 
     if (error) {
       Alert.alert("Sign in failed", error.message);
     }
-
-    router.push("/(app)");
-    // The AuthProvider updates the session and Expo Router opens the app.
+    // The root auth guard reacts to the updated session.
   }
 
   return (
@@ -50,7 +45,6 @@ export default function SignInScreen() {
         <View style={styles.logo}>
           <Text style={styles.logoText}>s</Text>
         </View>
-
         <Text style={styles.title}>Welcome back.</Text>
         <Text style={styles.subtitle}>
           Sign in to connect with your neighbourhood.
@@ -179,9 +173,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  disabled: {
-    opacity: 0.6,
-  },
+  disabled: { opacity: 0.6 },
   buttonText: {
     color: "#FFFFFF",
     fontSize: 15,
@@ -192,13 +184,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: 32,
   },
-  bottomText: {
-    color: "#65746D",
-    fontSize: 13,
-  },
-  link: {
-    color: "#398365",
-    fontSize: 13,
-    fontWeight: "700",
-  },
+  bottomText: { color: "#65746D", fontSize: 13 },
+  link: { color: "#398365", fontSize: 13, fontWeight: "700" },
 });

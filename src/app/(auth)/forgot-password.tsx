@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import {
   Alert,
@@ -9,6 +8,7 @@ import {
   View,
 } from "react-native";
 import { Link } from "expo-router";
+import * as Linking from "expo-linking";
 import { supabase } from "@/utils/supabase";
 
 export default function ForgotPasswordScreen() {
@@ -22,14 +22,11 @@ export default function ForgotPasswordScreen() {
     }
 
     setLoading(true);
-
+    const redirectTo = Linking.createURL("reset-password");
     const { error } = await supabase.auth.resetPasswordForEmail(
-      email.trim(),
-      {
-        redirectTo: "salamz://reset-password",
-      }
+      email.trim().toLowerCase(),
+      { redirectTo }
     );
-
     setLoading(false);
 
     if (error) {
@@ -39,7 +36,7 @@ export default function ForgotPasswordScreen() {
 
     Alert.alert(
       "Check your email",
-      "If an account exists for this address, you'll receive a password reset link."
+      "If an account exists for this address, you will receive a password reset link."
     );
   }
 
@@ -50,19 +47,17 @@ export default function ForgotPasswordScreen() {
         <Text style={styles.subtitle}>
           Enter your account email and we'll send you a reset link.
         </Text>
-
         <TextInput
           style={styles.input}
           value={email}
           onChangeText={setEmail}
           placeholder="you@example.com"
-          placeholderTextColor="#9AA69F"
           keyboardType="email-address"
           autoCapitalize="none"
+          autoComplete="email"
         />
-
         <Pressable
-          style={styles.button}
+          style={[styles.button, loading && styles.disabled]}
           onPress={handleReset}
           disabled={loading}
         >
@@ -70,61 +65,20 @@ export default function ForgotPasswordScreen() {
             {loading ? "Sending..." : "Send reset link"}
           </Text>
         </Pressable>
-
-        <Link href="/" style={styles.link}>Back to sign in</Link>
+        <Link href="/sign-in" style={styles.link}>Back to sign in</Link>
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: "#F7F8F5",
-    justifyContent: "center",
-    padding: 28,
-  },
-  content: {
-    width: "100%",
-    maxWidth: 420,
-    alignSelf: "center",
-  },
-  title: {
-    color: "#173B30",
-    fontSize: 28,
-    fontWeight: "700",
-  },
-  subtitle: {
-    color: "#65746D",
-    fontSize: 15,
-    lineHeight: 24,
-    marginTop: 12,
-    marginBottom: 28,
-  },
-  input: {
-    height: 54,
-    backgroundColor: "#FFFFFF",
-    borderColor: "#DFE7E0",
-    borderWidth: 1,
-    borderRadius: 12,
-    paddingHorizontal: 15,
-  },
-  button: {
-    height: 54,
-    backgroundColor: "#174C3B",
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 20,
-  },
-  buttonText: {
-    color: "#FFFFFF",
-    fontWeight: "700",
-  },
-  link: {
-    color: "#398365",
-    textAlign: "center",
-    marginTop: 28,
-    fontWeight: "600",
-  },
+  screen: { flex: 1, backgroundColor: "#F7F8F5", justifyContent: "center", padding: 28 },
+  content: { width: "100%", maxWidth: 420, alignSelf: "center" },
+  title: { color: "#173B30", fontSize: 28, fontWeight: "700" },
+  subtitle: { color: "#65746D", fontSize: 15, lineHeight: 24, marginTop: 12, marginBottom: 28 },
+  input: { height: 54, backgroundColor: "#FFFFFF", borderColor: "#DFE7E0", borderWidth: 1, borderRadius: 12, paddingHorizontal: 15 },
+  button: { height: 54, backgroundColor: "#174C3B", borderRadius: 12, alignItems: "center", justifyContent: "center", marginTop: 20 },
+  disabled: { opacity: 0.6 },
+  buttonText: { color: "#FFFFFF", fontWeight: "700" },
+  link: { color: "#398365", textAlign: "center", marginTop: 28, fontWeight: "600" },
 });

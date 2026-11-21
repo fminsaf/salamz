@@ -1,4 +1,3 @@
-
 import {
   createContext,
   useContext,
@@ -9,12 +8,12 @@ import {
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/utils/supabase";
 
-type AuthContextType = {
+type AuthContextValue = {
   session: Session | null;
   loading: boolean;
 };
 
-const AuthContext = createContext<AuthContextType>({
+const AuthContext = createContext<AuthContextValue>({
   session: null,
   loading: true,
 });
@@ -26,20 +25,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let mounted = true;
 
-    supabase.auth.getSession().then(({ data, error }) => {
-      if (error) console.error(error.message);
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      if (mounted) {
+        setSession(nextSession);
+        setLoading(false);
+      }
+    });
+
+    void supabase.auth.getSession().then(({ data, error }) => {
+      if (error) {
+        console.error("Unable to restore the Supabase session:", error.message);
+      }
 
       if (mounted) {
         setSession(data.session);
         setLoading(false);
       }
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setLoading(false);
     });
 
     return () => {
